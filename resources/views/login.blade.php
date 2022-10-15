@@ -20,7 +20,7 @@
       <a href="#" class="h1"><b>Tizimga kirish</b></a>
     </div>
     <div class="card-body">
-      
+
       @if ($errors->any())
       <script>
         @foreach ($errors->all() as $error)
