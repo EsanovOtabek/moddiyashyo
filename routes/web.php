@@ -4,6 +4,7 @@ use App\Http\Controllers\AccountantController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProrektorController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SectionController;
 use App\Http\Controllers\WarehouseController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
@@ -49,6 +50,9 @@ Route::prefix('admin/')->middleware('role:admin')->group(function(){
     Route::resource('buildings', BuildingController::class,[
         'as' => 'admin'
     ]);
+    Route::get('buildings/{building}/{room}', [RoomController::class,'show'])->name('admin.buildings.room');
+    Route::get( 'createRoom', [RoomController::class,'create'])->name('admin.room.create');
+    Route::post('createRoom', [RoomController::class,'store'])->name('admin.room.store');
 
     Route::resource('categories', CategoryController::class,[
         'except' =>['create', 'edit'],
@@ -56,20 +60,20 @@ Route::prefix('admin/')->middleware('role:admin')->group(function(){
     ]);
 
     Route::resource('items', ItemController::class,[
-        'except' => ['show','edit'],
+        'except' => ['show','edit','create'],
         'as' => 'admin'
     ]);
-
     Route::get('items/add/',[ItemController::class,'edit'])->name('admin.item.add');
     Route::post('items/add/{id}',[ItemController::class,'add'])->name('admin.items.add');
 
-    Route::get('buildings/{building}/{room}', [RoomController::class,'show'])->name('admin.buildings.room');
-
-    Route::get( 'createRoom', [RoomController::class,'create'])->name('admin.room.create');
-    Route::post('createRoom', [RoomController::class,'store'])->name('admin.room.store');
     Route::resource('orders', OrderController::class,[
+        'only' => ['index','destroy'],
         'as' => 'admin',
-        'only' => ['index','destroy']
+    ]);
+
+    Route::resource('sections', SectionController::class,[
+        'except' => ['show','edit','create'],
+        'as' => 'admin',
     ]);
 });
 

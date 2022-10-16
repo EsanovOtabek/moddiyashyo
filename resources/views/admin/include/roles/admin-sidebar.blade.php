@@ -90,6 +90,16 @@
     </ul>
 </li>
 
+{{-- Bo'lim va Fakultetlar --}}
+<li class="nav-item">
+    <a href="{{ route(auth()->user()->role . '.sections.index') }}" class="nav-link">
+        <i class="nav-icon fas fa-graduation-cap"></i>
+        <p>
+            Bo'lim va Fakultetlar
+        </p>
+    </a>
+</li>
+
 {{--Kategoriyalar--}}
 <li class="nav-item">
     <a href="{{ route(auth()->user()->role . '.categories.index') }}" class="nav-link">

@@ -39,7 +39,7 @@ class BuildingController extends Controller
 
     public function store(Request $request)
     {
-        $user = Building::create($this->validateData());
+        $data = Building::create($this->validateData());
         return redirect()->back()->with('success_msg', "Bino muvaffaqiyatli qo'shildi!");
     }
 
@@ -73,9 +73,7 @@ class BuildingController extends Controller
 
     public function update(Request $request, Building $building)
     {
-        $data = $this->validateData();
-
-        $building->update($data);
+        $building->update($this->validateData());
         return redirect()->back()->with('success_msg', "Bino ma'lumotlari yangilandi!");
     }
 
