@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccountantController;
+use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProrektorController;
 use App\Http\Controllers\RoleController;
@@ -33,8 +34,7 @@ Route::get('login',[AuthController::class, 'index'])->name('login.index');
 Route::post('login',[AuthController::class, 'login'])->name('login');
 Route::get('logout',[AuthController::class, 'logout'])->name('logout');
 
-
-Route::prefix('admin/')->middleware('role:admin')->group(function(){
+Route::group(['prefix'=>'admin','middleware'=>'role:admin'],function(){
     Route::get('home/',[AdminController::class, 'home']);
     Route::get('/',[AdminController::class, 'home']);
 
@@ -85,6 +85,7 @@ Route::prefix('komendant/')->middleware('role:komendant')->group(function(){
     Route::get( 'createRoom', [RoomController::class,'create'])->name('komendant.room.create');
     Route::post('createRoom', [RoomController::class,'store'])->name('komendant.room.store');
     Route::get('buildings/{building}/{room}', [RoomController::class,'show'])->name('komendant.buildings.room');
+    Route::get('sections',[SectionController::class, 'index'])->name('komendant.sections.index');
 
     Route::resource('orders', OrderController::class,[
         'as' => 'komendant',
@@ -105,6 +106,7 @@ Route::prefix('prorektor/')->middleware('role:prorektor')->group(function(){
     Route::put('orders/{order}/accept',[OrderController::class, 'accept'])->name('prorektor.orders.accept');
     Route::get('items/',[ItemController::class, 'index'])->name('prorektor.items.index');
     Route::get('categories/',[CategoryController::class, 'index'])->name('prorektor.categories.index');
+    Route::get('sections',[SectionController::class, 'index'])->name('prorektor.sections.index');
 });
 
 Route::prefix('accountant/')->middleware('role:accountant')->group(function(){
@@ -119,32 +121,40 @@ Route::prefix('accountant/')->middleware('role:accountant')->group(function(){
     Route::get('users/',[UserController::class, 'index'])->name('accountant.users.index');
     Route::get('users/{user}',[UserController::class, 'show'])->name('accountant.users.show');
     Route::get('items/',[ItemController::class, 'index'])->name('accountant.items.index');
+    Route::get('sections',[SectionController::class, 'index'])->name('accountant.sections.index');
 });
-
-
 
 Route::prefix('warehouse/')->middleware('role:warehouse')->group(function(){
     Route::get('home/',[WarehouseController::class, 'home']);
     Route::get('/',[WarehouseController::class, 'home']);
-
     Route::get('buildings',[BuildingController::class, 'index'])->name('warehouse.buildings.index');
     Route::get('buildings/{building}',[BuildingController::class, 'show'])->name('warehouse.buildings.show');
     Route::get('buildings/{building}/{room}', [RoomController::class,'show'])->name('warehouse.buildings.room');
-
     Route::resource('categories', CategoryController::class,[
         'except' =>['create', 'edit'],
         'as' => 'warehouse'
     ]);
-
     Route::resource('items', ItemController::class,[
         'except' => ['show','edit'],
         'as' => 'warehouse'
     ]);
     Route::get('items/add/',[ItemController::class,'edit'])->name('warehouse.item.add');
     Route::post('items/add/{id}',[ItemController::class,'add'])->name('warehouse.items.add');
-
     Route::get('orders/',[OrderController::class, 'index'])->name('warehouse.orders.index');
     Route::put('orders/{order}/reject',[OrderController::class, 'reject'])->name('warehouse.orders.reject');
     Route::put('orders/{order}/accept',[OrderController::class, 'accept'])->name('warehouse.orders.accept');
+    Route::get('sections',[SectionController::class, 'index'])->name('warehouse.sections.index');
 
 });
+
+Route::prefix('employee/')->middleware('role:employee')->group(function(){
+    Route::get('home/',[EmployeeController::class, 'home']);
+    Route::get('/',[EmployeeController::class, 'home']);
+    Route::get('sections',[SectionController::class, 'index'])->name('employee.sections.index');
+
+    Route::resource('orders', OrderController::class,[
+        'as' => 'employee',
+        'expect' => ['show','edit','update']
+    ]);
+});
+

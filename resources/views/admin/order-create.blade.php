@@ -42,15 +42,24 @@
 
                                 <hr>
 
-
                                 <div class="form-group col-sm-6">
-                                    <label>Binoni tanlang</label>
-                                    <select class="form-control" name="building_id" required>
-                                        <option selected disabled>-- Tanlang --</option>
-                                        @foreach($buildings as $building)
-                                            <option value="{{$building->id}}">{{ $building->name }} </option>
-                                        @endforeach
-                                    </select>
+                                    @if(auth()->user()->role == 'komendant')
+                                        <label>Binoni tanlang</label>
+                                        <select class="form-control" name="building_id" required>
+                                            <option selected disabled>-- Tanlang --</option>
+                                            @foreach($buildings as $building)
+                                                <option value="{{$building->id}}">{{ $building->name }} </option>
+                                            @endforeach
+                                        </select>
+                                    @elseif(auth()->user()->role == 'employee')
+                                        <label>Bo'lim(Fakultet)ni tanlang</label>
+                                        <select class="form-control" name="section_id" required>
+                                            <option selected disabled>-- Tanlang --</option>
+                                            @foreach($sections as $section)
+                                                <option value="{{$section->id}}">{{ $section->name }} </option>
+                                            @endforeach
+                                        </select>
+                                    @endif
                                 </div>
 
                                 @csrf

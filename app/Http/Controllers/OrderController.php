@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Building;
 use App\Models\Item;
 use App\Models\Order;
+use App\Models\Section;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
@@ -14,7 +15,7 @@ class OrderController extends Controller
     {
         $rel = '>';
         $val = 0;
-        if($this->is('komendant')) {
+        if($this->is('komendant') || $this->is('employee')) {
             $rel = '=';
             $val = \auth()->user()->id;
         }
@@ -22,12 +23,15 @@ class OrderController extends Controller
             $join->on("users.id","=","orders.user_id");
         })->leftJoin('buildings',function ($join){
             $join->on('buildings.id','=','orders.building_id');
+        })->leftJoin('sections',function ($join){
+            $join->on('sections.id','=','orders.section_id');
         })->leftJoin('items',function ($join){
             $join->on('items.id','=','orders.item_id');
         })->select('orders.*',
             'users.name as username',
             'users.phone as userphone',
             'buildings.name as buildingname',
+            'sections.name as sectionname',
             'items.name as itemname')
             ->where('orders.user_id',$rel,$val)
             ->orderBy('orders.id','desc')->get();
@@ -41,13 +45,19 @@ class OrderController extends Controller
     {
         $items = Item::all();
         $buildings = Building::all();
+        $sections = Section::all();
 
         if($this->is('komendant')){
             $buildings = Building::where('user_id',auth()->user()->id)->get();
         }
+
+        if($this->is('employee')){
+            $buildings = Section::where('user_id',auth()->user()->id)->get();
+        }
         return view('admin.order-create',[
             'items' => $items,
             'buildings' => $buildings,
+            'sections' => $sections,
         ]);
     }
 
@@ -59,31 +69,28 @@ class OrderController extends Controller
             ->where('id',$request->building_id)
             ->exists();
 
+        $sectionCheck = Section::where('user_id',auth()->user()->id)
+            ->where('id',$request->section_id)
+            ->exists();
+
         if($this->is('komendant') && !$buildingCheck){
             return redirect()->back();
         }
 
+        if($this->is('section') && !$sectionCheck){
+            return redirect()->back();
+        }
+        $data['building_id'] = $request->building_id;
+        $data['section_id'] = $request->section_id;
         $data['user_id'] = auth()->user()->id;
         Order::create($data);
 
         return redirect()->back()->with('success_msg', "Buyurtma yuborildi!");
     }
 
-    public function show(Order $order)
-    {
-        //
-    }
-
-
-    public function edit(Order $order)
-    {
-        //
-    }
-
-    public function update(Request $request, Order $order)
-    {
-        //
-    }
+//    public function show(Order $order)
+//    public function edit(Order $order)
+//    public function update(Request $request, Order $order)
 
     public function destroy(Order $order)
     {
@@ -93,12 +100,18 @@ class OrderController extends Controller
 
     public function reject(Order $order)
     {
-        if ($this->is('prorektor'))
-            $order->status_1='rejected';
-        elseif ($this->is('accountant'))
-            $order->status_2='rejected';
-        elseif ($this->is('ombor'))
+        if ($this->is('prorektor')) {
+            $order->status_1 = 'rejected';
+            $order->status_1_id = auth()->user()->id();
+        }
+        elseif ($this->is('accountant')) {
+            $order->status_2 = 'rejected';
+            $order->status_2_id = auth()->user()->id();
+        }
+        elseif ($this->is('warehouse')){
             $order->status_3='rejected';
+            $order->status_3_id = auth()->user()->id();
+        }
         else return redirect()->back();
 
         $order->save();
@@ -106,23 +119,28 @@ class OrderController extends Controller
     }
 
     public function accept(Order $order)
+
     {
-        if ($this->is('prorektor'))
-            $order->status_1='accepted';
-        elseif ($this->is('accountant'))
-            $order->status_2='accepted';
-        elseif ($this->is('ombor'))
+        if ($this->is('prorektor')) {
+            $order->status_1 = 'accepted';
+            $order->status_1_id = auth()->user()->id;
+        }
+        elseif ($this->is('accountant')) {
+            $order->status_2 = 'accepted';
+            $order->status_2_id = auth()->user()->id;
+        }
+        elseif ($this->is('warehouse')){
             $order->status_3='accepted';
+            $order->status_3_id = auth()->user()->id;
+        }
         else return redirect()->back();
 
         $order->save();
         return redirect()->back()->with('success_msg','Buyurtma tasdiqlandi!');
 
     }
-
     public function validateData(){
         return request()->validate([
-            'building_id' => 'required|numeric',
             'quantity' => 'required|numeric',
             'item_id' => 'required|numeric',
         ],[

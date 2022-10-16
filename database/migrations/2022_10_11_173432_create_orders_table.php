@@ -15,12 +15,16 @@ class CreateOrdersTable extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
-            $table->foreignId('building_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
-            $table->foreignId('item_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
+            $table->foreignId('user_id')->nullable()->constrained()->onUpdate('cascade')->onDelete('cascade');
+            $table->foreignId('building_id')->nullable()->constrained()->onUpdate('cascade')->onDelete('cascade');
+            $table->foreignId('section_id')->nullable()->constrained()->onUpdate('cascade')->onDelete('cascade');
+            $table->foreignId('item_id')->nullable()->constrained()->onUpdate('cascade')->onDelete('cascade');
             $table->enum('status_1',['waiting','rejected','accepted'])->default('waiting');
+            $table->integer('status_1_id')->nullable();
             $table->enum('status_2',['waiting','rejected','accepted'])->default('waiting');
+            $table->integer('status_2_id')->nullable();
             $table->enum('status_3',['waiting','rejected','accepted'])->default('waiting');
+            $table->integer('status_3_id')->nullable();
             $table->integer('quantity');
             $table->softDeletes();
             $table->timestamps();

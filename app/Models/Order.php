@@ -14,10 +14,14 @@ class Order extends Model
     protected $fillable = [
         'user_id',
         'building_id',
+        'section_id',
         'item_id',
         'status_1',
+        'status_1_id',
         'status_2',
+        'status_2_id',
         'status_3',
+        'status_3_id',
         'quantity',
     ];
 
@@ -31,5 +35,9 @@ class Order extends Model
 
     public function item(){
         return $this->belongsTo(Item::class);
+    }
+
+    public function section(){
+        return $this->belongsTo(Section::class);
     }
 }

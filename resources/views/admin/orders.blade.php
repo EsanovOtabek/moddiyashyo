@@ -44,7 +44,7 @@ $orb = new OrderController;
                             <th>Jihoz</th>
                             <th>Miqdori</th>
                             <th>Buyurtmachi</th>
-                            <th>Bino</th>
+                                <th>Bino yoki Bo'lim(Fakultet)</th>
                             <th>Status</th>
                             @if(auth()->user()->role == 'admin' || auth()->user()->role == 'komendant' || auth()->user()->role == 'employee')
                                 <th>O'chirish</th>
@@ -74,9 +74,16 @@ $orb = new OrderController;
                                 <td>
                                     <h4><span class="badge badge-light">{{ $order->username }}</span></h4>
                                 </td>
-                                <td>
-                                    <h4><a href="{{ route(auth()->user()->role . '.buildings.show',['building'=>$order->building_id]) }}" class="badge badge-light">{{ $order->buildingname }}</a></h4>
-                                </td>
+                                @if(is_null($order->sectionname))
+                                    <td>
+                                        <h4><span class="badge badge-light">{{ $order->buildingname }}</span></h4>
+                                    </td>
+                                @endif
+                                @if(is_null($order->buildingname))
+                                    <td>
+                                        <h4><span class="badge badge-light">{{ $order->sectionname }}</span></h4>
+                                    </td>
+                                @endif
                                 <td class="bg-gradient-{{$status}}">
                                     <!--status1-->
                                     <button class="badges bg-{{ $orb->status_class($order->status_1)['class'] }}"><i class="fas fa-{{ $orb->status_class($order->status_1)['icon'] }}"></i></button>
@@ -86,7 +93,7 @@ $orb = new OrderController;
                                     <button class="badges bg-{{ $orb->status_class($order->status_3)['class'] }}"><i class="fas fa-{{ $orb->status_class($order->status_3)['icon'] }}"></i></button>
                                 </td>
                                 @if(auth()->user()->role == 'admin' || auth()->user()->role == 'komendant' || auth()->user()->role == 'employee')
-                                <td>
+                                    <td>
                                         <form action="{{ route(auth()->user()->role.'.orders.destroy', $order->id) }}" method="POST" onsubmit="return confirm('Buyurtmani bekor qilmoqchimisiz?')" style="display: inline;">
                                             @csrf
                                             @method('DELETE')
@@ -94,7 +101,7 @@ $orb = new OrderController;
                                                 <i class="fa fa-trash"></i>
                                             </button>
                                         </form>
-                                </td>
+                                    </td>
                                 @else
                                     <td class="bg-light">
                                         <button type="submit" class="btn btn-info" id="status" onclick="statusEdit({{ $order->id }})">

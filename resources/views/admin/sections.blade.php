@@ -42,20 +42,20 @@
                             </p>
                         </td>
 
-                    @if(auth()->user()->role == 'admin')
+                        @if(auth()->user()->role == 'admin')
                             <td style="width: 20%">
-                            <button onclick="editSection({{ $section->id }})" class="btn btn-warning">
-                                <i class="fa fa-edit"></i>
-                            </button>
-                            |
-                            <form action="{{ route(auth()->user()->role . '.sections.destroy', $section->id) }}" method="POST" onsubmit="return confirm('Bo\'lim(Fakultet)ni  o\'chirmoqchimisiz?')" style="display: inline;">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-danger">
-                                    <i class="fa fa-trash"></i>
+                                <button onclick="editSection({{ $section->id }})" class="btn btn-warning">
+                                    <i class="fa fa-edit"></i>
                                 </button>
-                            </form>
-                        </td>
+                                |
+                                <form action="{{ route(auth()->user()->role . '.sections.destroy', $section->id) }}" method="POST" onsubmit="return confirm('Bo\'lim(Fakultet)ni  o\'chirmoqchimisiz?')" style="display: inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
                         @endif
                     </tr>
                 @endforeach
@@ -69,33 +69,33 @@
         @include('admin.include.section-modal')
     @endif
 @endsection
+@if(auth()->user()->role == 'admin')
 
-@push('page_js')
-    <script src="{{ asset('plugins/select2/js/select2.full.min.js') }}"></script>
+    @push('page_js')
+        <script src="{{ asset('plugins/select2/js/select2.full.min.js') }}"></script>
 
-    <script>
-        $('.select2').select2()
+        <script>
+            $('.select2').select2()
 
-        var sections = @json($sections);
-        function editSection(id) {
-            var section;
+            var sections = @json($sections);
+            function editSection(id) {
+                var section;
 
-            sections.forEach(function(s) {
-                // console.log(it);
-                if(Number(s['id']) === Number(id)){
-                    section=s;
-                    return;
-                }
-            })
+                sections.forEach(function(s) {
+                    // console.log(it);
+                    if(Number(s['id']) === Number(id)){
+                        section=s;
+                        return;
+                    }
+                })
 
-            $('#modal_name').html(section['name']);
-            $('#modal-edit-name').val(section['name']);
-            $('#modal-edit-director').val(section['director']);
-            // $('#modal-edit-employee').select2('val',section['user_id']);
-            $('#modal-edit-employee').val(section['user_id']).trigger('change');
-
-            $('#modal-section-edit').modal('toggle');
-            $('#formUpdate').attr('action', "{{ route(auth()->user()->role . '.sections.index') }}/"+id );
-        }
-    </script>
-@endpush
+                $('#modal_name').html(section['name']);
+                $('#modal-edit-name').val(section['name']);
+                $('#modal-edit-director').val(section['director']);
+                $('#modal-edit-employee').val(section['user_id']).trigger('change');
+                $('#modal-section-edit').modal('toggle');
+                $('#formUpdate').attr('action', "{{ route(auth()->user()->role . '.sections.index') }}/"+id );
+            }
+        </script>
+    @endpush
+@endif
