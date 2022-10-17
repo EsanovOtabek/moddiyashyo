@@ -17,11 +17,8 @@ class Role
 
         $user = Auth::user();
 
-        if($user->role == 'admin')
-            return $next($request);
-
         foreach($roles as $role) {
-            if(RoleController::hasRole($role))
+            if($user->role == $role)
                 return $next($request);
         }
 

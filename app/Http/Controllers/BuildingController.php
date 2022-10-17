@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Auth;
 
 class BuildingController extends Controller
 {
-
     public function index()
     {
         $rel = '>';
