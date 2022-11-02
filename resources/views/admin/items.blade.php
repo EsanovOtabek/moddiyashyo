@@ -41,7 +41,8 @@
                             <th>T/R</th>
                             <th>Nomi</th>
                             <th>Kategoriya</th>
-                            <th>Miqdori</th>
+                            <th>Jami miqdori</th>
+                            <th>Mavjud</th>
                             @if(auth()->user()->role == 'admin' || auth()->user()->role == 'warehouse')
                                 <th>Edit | Delete</th>
                             @endif
@@ -50,14 +51,14 @@
                         <tbody>
                         @foreach($items as $item)
 
-                            <tr class="{{ $item->amount == 0 ? 'bg-gradient-danger ':''}}" >
+                            <tr class="{{ $item->amount == $item->minus_amount ? 'bg-gradient-danger ':''}}" >
                                 <td>{{ $loop->index+1 }}</td>
                                 <td>{{ $item->name }}</td>
                                 <td>{{ $item->category }}</td>
                                 <td>
                                     @if(auth()->user()->role == 'admin' || auth()->user()->role == 'warehouse')
                                         <div id="additem-{{ $item->id }}" class="additemdiv">
-                                            <h3 class="d-inline"><span class="badge badge-info"> {{ $item->amount }}</h3></span>
+                                            <h3 class="d-inline"><span class="badge badge-info"> {{ $item->amount }}</span></h3>
                                             <button class="btn btn-primary" onclick='addItem({{ $item->id }})'>
                                                 <i class="fas fa-plus"></i>
                                             </button>
@@ -68,9 +69,12 @@
                                             <button class="btn btn-primary">ok</button>
                                         </form>
                                     @else
-                                        <h3 class="d-inline"><span class="badge badge-info"> {{ $item->amount }}</h3></span>
+                                        <h3 class="d-inline"><span class="badge badge-info"> {{ $item->amount }}</span></h3>
                                     @endif
                                 </td>
+                                <td><h3 class="d-inline">
+                                        <span class="badge badge-light"> {{ $item->amount - $item->minus_amount }}</span>
+                                    </h3></td>
                                 @if(auth()->user()->role == 'admin' || auth()->user()->role == 'warehouse')
                                     <td>
                                         <button type="button"
@@ -96,11 +100,8 @@
                 </div>
                 <!-- /.card-body -->
                 <div class="card-footer">
-                    <nav aria-label="">
-                        <ul class="pagination justify-content-center m-0">
-                            {{ $items->links() }}
-                        </ul>
-                    </nav>
+                    <hr>
+                    <a href="{{ route($this->role.".items.accepted") }}">Tasdiqlangan buyurtmalar</a>
                 </div>
                 <!-- /.card-footer -->
             </div>

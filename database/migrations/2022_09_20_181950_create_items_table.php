@@ -12,7 +12,7 @@ class CreateItemsTable extends Migration
      * @return void
      */
 
-    
+
     public function up()
     {
         Schema::create('items', function (Blueprint $table) {
@@ -20,10 +20,11 @@ class CreateItemsTable extends Migration
             $table->string('name');
             $table->unsignedBigInteger('category_id');
             $table->integer('amount');
+            $table->integer('minus_amount')->default(0);
             $table->timestamps();
 
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
-            
+
         });
     }
 

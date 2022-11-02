@@ -15,10 +15,29 @@ class OrderController extends Controller
     {
         $rel = '>';
         $val = 0;
+
+        $rel1 = '!=';
+        $val1 = null;
+
+        $rel2 = '!=';
+        $val2 = null;
         if($this->is('komendant') || $this->is('employee')) {
             $rel = '=';
             $val = \auth()->user()->id;
         }
+
+        if($this->is('accountant')){
+            $rel1='=';
+            $val1='accepted';
+        }
+        if($this->is('warehouse')){
+            $rel1='=';
+            $val1='accepted';
+            $rel2='=';
+            $val2='accepted';
+        }
+
+
         $orders = Order::leftJoin('users',function($join) {
             $join->on("users.id","=","orders.user_id");
         })->leftJoin('buildings',function ($join){
@@ -27,17 +46,26 @@ class OrderController extends Controller
             $join->on('sections.id','=','orders.section_id');
         })->leftJoin('items',function ($join){
             $join->on('items.id','=','orders.item_id');
+        })->leftJoin('items as it',function ($join){
+            $join->on('it.id','=','orders.new_item_id');
         })->select('orders.*',
             'users.name as username',
             'users.phone as userphone',
             'buildings.name as buildingname',
             'sections.name as sectionname',
-            'items.name as itemname')
+            'items.name as itemname',
+            'items.id as item_id',
+            'it.name as newitemname',
+        )
             ->where('orders.user_id',$rel,$val)
+            ->where('orders.status_1',$rel1,$val1)
+            ->where('orders.status_2',$rel2,$val2)
             ->orderBy('orders.id','desc')->get();
 
+        $new_items = Item::all();
         return view('admin.orders',[
             'orders' => $orders,
+            'new_items' => $new_items,
         ]);
     }
 
@@ -83,6 +111,8 @@ class OrderController extends Controller
         $data['building_id'] = $request->building_id;
         $data['section_id'] = $request->section_id;
         $data['user_id'] = auth()->user()->id;
+        $data['new_item_id'] = $data['item_id'];
+        $data['quantity'] = $data['new_quantity'];
         Order::create($data);
 
         return redirect()->back()->with('success_msg', "Buyurtma yuborildi!");
@@ -102,15 +132,15 @@ class OrderController extends Controller
     {
         if ($this->is('prorektor')) {
             $order->status_1 = 'rejected';
-            $order->status_1_id = auth()->user()->id();
+            $order->status_1_id = auth()->user()->id;
         }
         elseif ($this->is('accountant')) {
             $order->status_2 = 'rejected';
-            $order->status_2_id = auth()->user()->id();
+            $order->status_2_id = auth()->user()->id;
         }
         elseif ($this->is('warehouse')){
             $order->status_3='rejected';
-            $order->status_3_id = auth()->user()->id();
+            $order->status_3_id = auth()->user()->id;
         }
         else return redirect()->back();
 
@@ -118,14 +148,19 @@ class OrderController extends Controller
         return redirect()->back()->with('success_msg','Buyurtma rad etildi!');
     }
 
-    public function accept(Order $order)
-
+    public function accept(Request $request,Order $order)
     {
         if ($this->is('prorektor')) {
+            $data = $this->validateData();
+            $order->new_item_id = $data['item_id'];
+            $order->new_quantity = $data['quantity'];
             $order->status_1 = 'accepted';
             $order->status_1_id = auth()->user()->id;
         }
         elseif ($this->is('accountant')) {
+            $data = $this->validateData();
+            $order->new_item_id = $data['item_id'];
+            $order->new_quantity = $data['quantity'];
             $order->status_2 = 'accepted';
             $order->status_2_id = auth()->user()->id;
         }

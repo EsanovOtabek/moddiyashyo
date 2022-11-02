@@ -22,10 +22,11 @@ class ItemController extends Controller
             $rel = "LIKE";
             $val = "%".$request->search."%";
         }
+
         if($request->category and $request->category!='all'){
-            $col = "items.category_id";
-            $rel = "=";
-            $val = $request->category;
+            $col1 = "items.category_id";
+            $rel1 = "=";
+            $val1 = $request->category;
         }
     
         $items = Item::leftJoin('categories',function($join){

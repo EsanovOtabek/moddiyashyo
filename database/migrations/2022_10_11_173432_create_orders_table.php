@@ -19,6 +19,7 @@ class CreateOrdersTable extends Migration
             $table->foreignId('building_id')->nullable()->constrained()->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('section_id')->nullable()->constrained()->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('item_id')->nullable()->constrained()->onUpdate('cascade')->onDelete('cascade');
+            $table->foreignId('new_item_id')->nullable()->constrained()->onUpdate('cascade')->onDelete('cascade');
             $table->enum('status_1',['waiting','rejected','accepted'])->default('waiting');
             $table->integer('status_1_id')->nullable();
             $table->enum('status_2',['waiting','rejected','accepted'])->default('waiting');
@@ -26,6 +27,7 @@ class CreateOrdersTable extends Migration
             $table->enum('status_3',['waiting','rejected','accepted'])->default('waiting');
             $table->integer('status_3_id')->nullable();
             $table->integer('quantity');
+            $table->integer('new_quantity')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

@@ -16,6 +16,7 @@ class Order extends Model
         'building_id',
         'section_id',
         'item_id',
+        'new_item_id',
         'status_1',
         'status_1_id',
         'status_2',
@@ -23,6 +24,7 @@ class Order extends Model
         'status_3',
         'status_3_id',
         'quantity',
+        'new_quantity',
     ];
 
     public function user(){

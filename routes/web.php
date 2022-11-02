@@ -70,6 +70,7 @@ Route::group(['prefix'=>'admin','middleware'=>'role:admin'],function(){
         'only' => ['index','destroy'],
         'as' => 'admin',
     ]);
+    Route::get('orders/acceptedOrders',[OrderController::class,'acceptOrders'])->name('admin.items.accepted');
 
     Route::resource('sections', SectionController::class,[
         'except' => ['show','edit','create'],
@@ -91,6 +92,7 @@ Route::prefix('komendant/')->middleware('role:komendant')->group(function(){
         'as' => 'komendant',
         'expect' => ['show','edit','update']
     ]);
+    Route::get('orders/acceptedOrders',[OrderController::class,'acceptOrders'])->name('komendant.items.accepted');
 });
 
 Route::prefix('prorektor/')->middleware('role:prorektor')->group(function(){
@@ -107,6 +109,8 @@ Route::prefix('prorektor/')->middleware('role:prorektor')->group(function(){
     Route::get('items/',[ItemController::class, 'index'])->name('prorektor.items.index');
     Route::get('categories/',[CategoryController::class, 'index'])->name('prorektor.categories.index');
     Route::get('sections',[SectionController::class, 'index'])->name('prorektor.sections.index');
+    Route::get('orders/acceptedOrders',[OrderController::class,'acceptOrders'])->name('prorektor.items.accepted');
+
 });
 
 Route::prefix('accountant/')->middleware('role:accountant')->group(function(){
@@ -122,6 +126,7 @@ Route::prefix('accountant/')->middleware('role:accountant')->group(function(){
     Route::get('users/{user}',[UserController::class, 'show'])->name('accountant.users.show');
     Route::get('items/',[ItemController::class, 'index'])->name('accountant.items.index');
     Route::get('sections',[SectionController::class, 'index'])->name('accountant.sections.index');
+    Route::get('orders/acceptedOrders',[OrderController::class,'acceptOrders'])->name('accountant.items.accepted');
 });
 
 Route::prefix('warehouse/')->middleware('role:warehouse')->group(function(){
@@ -143,6 +148,7 @@ Route::prefix('warehouse/')->middleware('role:warehouse')->group(function(){
     Route::get('orders/',[OrderController::class, 'index'])->name('warehouse.orders.index');
     Route::put('orders/{order}/reject',[OrderController::class, 'reject'])->name('warehouse.orders.reject');
     Route::put('orders/{order}/accept',[OrderController::class, 'accept'])->name('warehouse.orders.accept');
+    Route::get('orders/acceptedOrders',[OrderController::class,'acceptOrders'])->name('warehouse.items.accepted');
     Route::get('sections',[SectionController::class, 'index'])->name('warehouse.sections.index');
 
 });
@@ -156,5 +162,6 @@ Route::prefix('employee/')->middleware('role:employee')->group(function(){
         'as' => 'employee',
         'expect' => ['show','edit','update']
     ]);
+    Route::get('orders/acceptedOrders',[OrderController::class,'acceptOrders'])->name('employee.items.accepted');
 });
 

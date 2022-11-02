@@ -41,10 +41,11 @@ $orb = new OrderController;
                         <thead>
                         <tr>
                             <th>T/R</th>
-                            <th>Jihoz</th>
-                            <th>Miqdori</th>
+{{--                            <th>Jihoz</th>--}}
+{{--                            <th>Miqdori</th>--}}
                             <th>Buyurtmachi</th>
-                                <th>Bino yoki Bo'lim(Fakultet)</th>
+                            <th>Vaqti</th>
+                            <th>Ma'lumot</th>
                             <th>Status</th>
                             @if(auth()->user()->role == 'admin' || auth()->user()->role == 'komendant' || auth()->user()->role == 'employee')
                                 <th>O'chirish</th>
@@ -65,25 +66,35 @@ $orb = new OrderController;
                             @endif
                             <tr class="">
                                 <td>{{ $loop->index+1 }}</td>
-                                <td>
-                                    <h4><span class="badge badge-light">{{ $order->itemname }}</span></h4>
-                                </td>
-                                <td>
-                                    <h4><span class="badge badge-light">{{ $order->quantity }} ta</span></h4>
-                                </td>
+{{--                                <td>--}}
+{{--                                    <h4><span class="badge badge-light">{{ $order->itemname }}</span></h4>--}}
+{{--                                </td>--}}
+{{--                                <td>--}}
+{{--                                    <h4><span class="badge badge-light">{{ $order->quantity }} ta</span></h4>--}}
+{{--                                </td>--}}
                                 <td>
                                     <h4><span class="badge badge-light">{{ $order->username }}</span></h4>
                                 </td>
-                                @if(is_null($order->sectionname))
-                                    <td>
-                                        <h4><span class="badge badge-light">{{ $order->buildingname }}</span></h4>
-                                    </td>
-                                @endif
-                                @if(is_null($order->buildingname))
-                                    <td>
-                                        <h4><span class="badge badge-light">{{ $order->sectionname }}</span></h4>
-                                    </td>
-                                @endif
+                                <td>
+                                    <h4><span class="badge badge-light">{{ $order->created_at }}</span></h4>
+                                </td>
+{{--                                @if(is_null($order->sectionname))--}}
+{{--                                    <td>--}}
+{{--                                        <h4><span class="badge badge-light">{{ $order->buildingname }}</span></h4>--}}
+{{--                                    </td>--}}
+{{--                                @endif--}}
+{{--                                @if(is_null($order->buildingname))--}}
+{{--                                    <td>--}}
+{{--                                        <h4><span class="badge badge-light">{{ $order->sectionname }}</span></h4>--}}
+{{--                                    </td>--}}
+{{--                                @endif--}}
+
+                                <td class="bg-light">
+                                    <button type="submit" class="btn btn-info" id="get_info" onclick="getInfo({{ $order->id }})">
+                                        <i class="fa fa-info-circle"></i> Batafsil
+                                    </button>
+                                </td>
+
                                 <td class="bg-gradient-{{$status}}">
                                     <!--status1-->
                                     <button class="badges bg-{{ $orb->status_class($order->status_1)['class'] }}"><i class="fas fa-{{ $orb->status_class($order->status_1)['icon'] }}"></i></button>
@@ -153,25 +164,67 @@ $orb = new OrderController;
 
     <script>
         var orders = @json($orders);
+        var items = @json($new_items);
         function statusEdit(id) {
             var order;
 
             orders.forEach(function(o) {
-                // console.log(it);
                 if(Number(o['id']) === Number(id)){
                     order=o;
                     return;
                 }
             })
 
-            $('#modal_item').html(order['itemname']);
-            $('#modal_quantity').html(order['quantity']);
-            $('#modal_user').html(order['username']);
-            $('#modal_building').html(order['buildingname']);
+            var select = "<select id='modal_item_id' name='item_id' class='form-control' required>";
+            var cat_id;
+            items.forEach(function (it){
+                if(Number(it['id']) === Number(order['item_id'])){
+                    cat_id=it['category_id'];
+                    return;
+                }
+            })
+
+            items.forEach(function (it){
+                if(Number(it['category_id']) === Number(cat_id)){
+                    select += "<option value='"+it['id']+"'" + (it['id']===order['new_item_id']?'selected':'') + ">"+it['name']+"</option>";
+                }
+            });
+
+            $('#modal_item').html(select+"</select>");
+            $('#modal_quantity').val(order['new_quantity']);
+            $('#modal_user').val(order['username']);
+            $('#modal_building').val(order['buildingname']);
             $('#modal-status').modal('toggle');
             $('#formReject').attr('action', "{{ route(auth()->user()->role . '.orders.index') }}/"+id+"/reject" );
             $('#formAccept').attr('action', "{{ route(auth()->user()->role . '.orders.index') }}/"+id+"/accept" );
+
+            @if(auth()->user()->role == 'warehouse')
+                $('#modal_quantity').prop('disabled',true);
+                $('#modal_item_id').prop('disabled',true);
+            @endif
         }
+
+        function getInfo(id) {
+            var order;
+            orders.forEach(function(o) {
+                if(Number(o['id']) === Number(id)){
+                    order=o;
+                    return;
+                }
+            })
+
+            $('#mi-date').html(order['created_at']);
+            $('#mi-item').val(order['itemname']);
+            $('#mi-quantity').val(order['quantity']);
+            $('#mi-user').val(order['username']);
+            $('#mi-building').val(order['buildingname']);
+            $('#mi-section').val(order['sectionname']);
+
+            $('#mi-new-item').val(order['newitemname']);
+            $('#mi-new-quantity').val(order['new_quantity']);
+            $('#modal-info').modal('toggle');
+        }
+
     </script>
 
 @endpush
