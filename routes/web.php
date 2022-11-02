@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccountantController;
+use App\Http\Controllers\BitemController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProrektorController;
@@ -76,6 +77,11 @@ Route::group(['prefix'=>'admin','middleware'=>'role:admin'],function(){
         'except' => ['show','edit','create'],
         'as' => 'admin',
     ]);
+
+    Route::post('buildings/{building}/{room}', [BitemController::class,'store'])->name('admin.bitems.store');
+    Route::delete('bitems/{bitem}', [BitemController::class,'destroy'])->name('admin.bitems.destroy');
+    Route::put('bitems/{bitem}', [BitemController::class,'update'])->name('admin.bitems.update');
+
 });
 
 Route::prefix('komendant/')->middleware('role:komendant')->group(function(){

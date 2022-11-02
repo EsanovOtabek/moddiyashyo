@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Bitem;
+use App\Models\Item;
 use Illuminate\Http\Request;
 use App\Models\Room;
 use App\Models\Building;
 
 class RoomController extends Controller
 {
-    // public function destroy($id)
     public function create(){
         $rel = '>';
         $val = 0;
@@ -33,8 +34,9 @@ class RoomController extends Controller
             return redirect()->route(auth()->user()->role . '.buildings.index');
 
         $data = $this->validateData($request);
-        $roomCheck = Room::where('building_id',$request->building_id)->where('room_no',$request->room_no)->get();
-        if(count($roomCheck)>0){
+        $roomCheck = $this->getRoom($request->building_id,$request->room_no);
+
+        if(count($roomCheck)>0 and $roomCheck!=null){
             $data['room_no'] = $data['floor'].''.$data['room_no'];
         }
         Room::create($data);
@@ -48,9 +50,16 @@ class RoomController extends Controller
 
     public function show($building_id,$room_no)
     {
-        $room = Room::where(
-            ['building_id'=>$building_id,'room_no'=>$room_no])->get();
-        return $room->all();
+        $room = $this->getRoom($building_id,$room_no);
+        $items = Item::all();
+        $bitems = Bitem::leftJoin('items',function ($join){
+            $join->on('items.id','=','bitems.item_id');
+        })->select('bitems.*','items.name')->where('bitems.building_id','=',$room->building_id)->where('bitems.room_id','=',$room->id)->orderBy('items.name','ASC')->get();
+        return view('admin.room',[
+            'room'=>$room,
+            'items'=>$items,
+            'bitems'=>$bitems,
+        ]);
     }
 
     public function edit($id)
@@ -61,6 +70,10 @@ class RoomController extends Controller
     public function update(Request $request, $id)
     {
         //
+    }
+
+    public function getRoom($building_id,$room_no) {
+        return Room::where(['building_id'=>$building_id,'room_no'=>$room_no])->first();
     }
 
     public function validateData(){

@@ -101,7 +101,6 @@
                 <!-- /.card-body -->
                 <div class="card-footer">
                     <hr>
-                    <a href="{{ route($this->role.".items.accepted") }}">Tasdiqlangan buyurtmalar</a>
                 </div>
                 <!-- /.card-footer -->
             </div>
